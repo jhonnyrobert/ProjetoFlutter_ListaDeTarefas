@@ -12,7 +12,7 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: ' TurismoApp',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.red,
       ),
       home: HomePage(),
     );
@@ -27,13 +27,6 @@ class HomePage extends StatefulWidget {
     items.add(Item(title: "items 0", done: false));
     items.add(Item(title: "items 1", done: true));
     items.add(Item(title: "items 2", done: false));
-    items.add(Item(title: "items 3", done: false));
-    items.add(Item(title: "items 4", done: false));
-    items.add(Item(title: "items 5", done: false));
-    items.add(Item(title: "items 6", done: true));
-    items.add(Item(title: "items 7", done: false));
-    items.add(Item(title: "items 8", done: true));
-    items.add(Item(title: "items 9", done: false));
   }
 
   @override
@@ -41,13 +34,37 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  var newTaskCtrl = TextEditingController();
+
+  void add() {
+    if (newTaskCtrl.text.isEmpty) return;
+    setState(() {
+      widget.items.add(
+        Item(title: newTaskCtrl.text, done: false),
+      );
+      newTaskCtrl.text = "";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // utliza-se Scaffold em vez de Container para retorna uma pagina
     return Scaffold(
       appBar: AppBar(
-        title: Text("Flutter App"),
+        title: TextFormField(
+          controller: newTaskCtrl,
+          keyboardType: TextInputType.text,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+          decoration: InputDecoration(
+            labelText: "Nova Tarefa",
+            labelStyle: TextStyle(color: Colors.white),
+          ),
+        ),
       ),
+
       // metodo para construir dinamicamente a lista, baseado no tamanho dos itens
       body: ListView.builder(
         itemCount: widget.items.length,
@@ -57,9 +74,18 @@ class _HomePageState extends State<HomePage> {
             title: Text(item.title),
             key: Key(item.title),
             value: item.done,
-            onChanged: (value) {},
+            onChanged: (value) {
+              setState(() {
+                item.done = value;
+              });
+            },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: add,
+        child: Icon(Icons.add),
+        backgroundColor: Colors.pink,
       ),
     );
   }
