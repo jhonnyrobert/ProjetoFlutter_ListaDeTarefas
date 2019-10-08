@@ -2,13 +2,13 @@
 // https://javiercbk.github.io/json_to_dart/
 // modelo para passar
 
-class Iten {
+class Item {
   String title;
   bool done;
 
-  Iten({this.title, this.done});
+  Item({this.title, this.done});
 
-  Iten.fromJson(Map<String, dynamic> json) {
+  Item.fromJson(Map<String, dynamic> json) {
     title = json['title'];
     done = json['done'];
   }
