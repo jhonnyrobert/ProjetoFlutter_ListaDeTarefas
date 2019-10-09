@@ -1,6 +1,8 @@
 // importação do pacote de icones do material design
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'Models/item.dart';
 
 void main() => runApp(App());
@@ -12,7 +14,7 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: ' TurismoApp',
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.purple,
       ),
       home: HomePage(),
     );
@@ -24,9 +26,6 @@ class HomePage extends StatefulWidget {
 
   HomePage() {
     items = [];
-    items.add(Item(title: "items 0", done: false));
-    items.add(Item(title: "items 1", done: true));
-    items.add(Item(title: "items 2", done: false));
   }
 
   @override
@@ -36,6 +35,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   var newTaskCtrl = TextEditingController();
 
+// FUNÇÃO PARA ADCIONAR ITEN A LISTA, {SE} SÓ CLIQUE NO BOTÃO ELE NÃO ADCIONA NADA
   void add() {
     if (newTaskCtrl.text.isEmpty) return;
     setState(() {
@@ -46,16 +46,37 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+// FUNÇÃO PARA REMOVER ITEN DA LISTA
   void remove(int index) {
     setState(() {
       widget.items.removeAt(index);
     });
   }
 
+  // FUNÇÃO PARA SALVAR A LISTA NO DISPOSITIVO
+
+  Future load() async {
+    var prefs = await SharedPreferences.getInstance();
+    var data = prefs.getString('data');
+
+// se a lista não for nula ele transforma os dados da lista em um JSON
+    if (data != null) {
+      Iterable decoded = jsonDecode(data);
+      List<Item> result = decoded.map((x) => Item.fromJson(x)).toList();
+      setState(() {
+        widget.items = result;
+      });
+    }
+  }
+
+  _HomePageState() {
+    load();
+  }
   @override
   Widget build(BuildContext context) {
     // utliza-se Scaffold em vez de Container para retorna uma pagina
     return Scaffold(
+      // barra superior
       appBar: AppBar(
         title: TextFormField(
           controller: newTaskCtrl,
@@ -89,7 +110,7 @@ class _HomePageState extends State<HomePage> {
             key: Key(item.title),
             background: Container(
               color: Colors.red.withOpacity(0.7),
-              child: Text("Excluir"),
+              child: Icon(Icons.delete),
             ),
             onDismissed: (direction) {
               print(direction);
@@ -97,10 +118,12 @@ class _HomePageState extends State<HomePage> {
           );
         },
       ),
+
+      // botão de ação
       floatingActionButton: FloatingActionButton(
         onPressed: add,
         child: Icon(Icons.add),
-        backgroundColor: Colors.pink,
+        backgroundColor: Colors.green,
       ),
     );
   }
